@@ -2,6 +2,7 @@
     display: none;
 }
 
+
 .custom-loader {
     width: 48px;
     height: 48px;
@@ -11,6 +12,7 @@
     border-right: 4px solid transparent;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
+    
 }
 
 .custom-loader::after {
@@ -38,12 +40,18 @@
 
 
 .breed-select {
+    margin-left: 20px;
     margin-top: 20px;
+    max-width: 200px;
 }
 
 .loader {
-    padding-top: 20px;
+    padding-top: 40px;
     color: #FF3D00;
+    display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
 }
 
 .error {
@@ -69,6 +77,11 @@
     border-radius: 5px;
 }
 
+.main-info img:hover {
+    transform: scale(1.5);
+    transition: transform 0.3s ease;
+
+}
 .main-info h1 {
     font-size: 24px;
     margin: 10px 0;

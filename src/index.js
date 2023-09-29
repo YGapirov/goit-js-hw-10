@@ -1,8 +1,6 @@
-
 import { fetchBreeds, fetchCatByBreed } from "./cat-api.js";
 import Notiflix from 'notiflix';
 import SlimSelect from 'slim-select'
-
 
 const elements = {
   breedSelect: document.querySelector('.breed-select'),
@@ -10,77 +8,90 @@ const elements = {
   errorInfo: document.querySelector('.error'),
   catInfo: document.querySelector('.cat-info')
 };
-//ініцалізація
+
+// Ініціалізація
 init();
 
-function init() {
-   
-   let breedsData;
-   //отримання списку порід і обробка результату
+function init() {   
   showCustomLoader();
   
   fetchBreeds()
     .then(data => {
-      const murkupBreed = data.map(breed => `<option value="${data.id}">${data.name}</option>`).join('');
-                 elements.breedSelect.innerHTML = ('beforeend', markupBreed);   
+      const markupBreed = data.map(breed => `<option value="${breed.id}">${breed.name}</option>`).join('');
+      elements.breedSelect.innerHTML = ('beforeend', markupBreed);    
+      hideCustomLoader();
+      elements.breedSelect.classList.remove('is-hidden');
       new SlimSelect({
-        select: elements.breedSelect
+        select: elements.breedSelect,
       });
+      
     })
     .catch(error => {
        console.log(error);
-       // повідомлення про помилку і приховуємо випадаючий список та завантажувач
-        elements.errorInfo.classList.remove('is-hidden');
-        elements.breedSelect.classList.add('is-hidden');
-        elements.loader.classList.add('is-hidden');
-    })
-
-   
-   //значення випадаючого вікна і приховування лодера інфо і помилок
-    elements.breedSelect.addEventListener('change', () => {
-       const selectBreedId = elements.breedSelect.value;
-       showCustomLoader();
-        elements.loader.classList.remove('is-hidden');
-        elements.catInfo.classList.add('is-hidden');
-         elements.errorInfo.classList.add('is-hidden');
-      //  Notiflix.Notify.failure('❌Oops! Something went wrong! Try reloading the page!', { position: 'center-top', distance: '200px'})
-
-       
-       // Запит на отримання інформації про кота та обробка результату
-        fetchCatByBreed(selectBreedId)
-        .then(result => {
-            const catData = result[0];
-            const breedData = breedsData.find(breed => breed.id === catData.breeds[0].id);
-
-            const markup = createMarkup(catData, breedData);
-            elements.catInfo.innerHTML = markup;
-
-            elements.loader.classList.add('is-hidden');
-            elements.catInfo.classList.remove('is-hidden');
-        })
-        .catch(error => {
-            console.log(error);
-            // elements.errorInfo.classList.remove('is-hidden');
-           elements.loader.classList.add('is-hidden');
-           Notiflix.Notify.failure('❌Oops! Something went wrong! Try reloading the page!', { position: 'center-top', distance: '200px'})
-        })
+       elements.errorInfo.classList.remove('is-hidden');
+       elements.breedSelect.classList.add('is-hidden');
+       elements.loader.classList.add('is-hidden');
     });
+
+  // Зміна випадаючого списку
+  elements.breedSelect.addEventListener('change', () => {
+  const selectBreedId = elements.breedSelect.value;
+    showCustomLoader();
+    
+  elements.loader.classList.remove('is-hidden');
+  elements.catInfo.classList.add('is-hidden');
+  elements.errorInfo.classList.add('is-hidden');
+
+  fetchCatByBreed(selectBreedId)
+    .then(data => {
+      const img = data[0].url;
+      const name = data[0].breeds[0].name;
+      const description = data[0].breeds[0].description;
+      const temperament = data[0].breeds[0].temperament;
+
+      elements.catInfo.innerHTML = createCatCard(img, name, description, temperament);
+
+      elements.loader.classList.add('is-hidden');
+      elements.catInfo.classList.remove('is-hidden');
+    })
+    .catch(error => {
+      hideCustomLoader();
+      console.log(error);
+      elements.loader.classList.add('is-hidden');
+      Notiflix.Notify.failure('Oops! Something went wrong! Try reloading the page!', { position: 'center-top', distance: '200px' });
+    });
+});
 }
 
-function createMarkup(catData, breedData){
-    return `<div class='main-info'> <img src='${catData.url}' width='300' alt='${breedData.name}'/>
-    <h1>${breedData.name}</h1>
-    <p>${breedData.description}</p>
+function createCatCard(img, name, description, temperament){
+hideCustomLoader();
+    return `<div class='main-info'> <img src='${img}' width='300' alt='${name}'/>
+    <h1>${name}</h1>
+    <p>${description}</p>
     <h2>Temperament</h2>
-    <p>${breedData.temperament}</p></div>`
+    <p>${temperament}</p></div>`
+  
 }
 
-
-//custom-loader
+// Custom loader
 function showCustomLoader() {
   const customLoader = document.querySelector('.custom-loader');
+  const loader = document.querySelector('.loader');
   if (customLoader) {
     customLoader.style.display = 'flex';
   }
+   if (loader) {
+    loader.style.display = 'flex';
+  }
 }
 
+function hideCustomLoader() {
+  const customLoader = document.querySelector('.custom-loader');
+  const loader = document.querySelector('.loader');
+  if (customLoader) {
+    customLoader.style.display = 'none';
+  }
+  if (loader) {
+    loader.style.display = 'none';
+  }
+}
