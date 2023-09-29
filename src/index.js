@@ -17,24 +17,15 @@ function init() {
    
    let breedsData;
    //отримання списку порід і обробка результату
-   showCustomLoader();
-    fetchBreeds()
+  showCustomLoader();
+  
+  fetchBreeds()
     .then(data => {
-        breedsData = data;
-        data.forEach(breed => {
-            const option = document.createElement('option');
-            option.value = breed.id;
-            option.textContent = breed.name;
-           elements.breedSelect.appendChild(option);
-           
-         // Показуємо випадаючий список і приховуємо завантажувач
-            elements.breedSelect.classList.remove('is-hidden');
-            elements.loader.classList.add('is-hidden');
-        })
-   //     new SlimSelect({
-   //      select: elements.breedSelect,
-   //      data: breedsData
-   //  });
+      const murkupBreed = data.map(breed => `<option value="${data.id}">${data.name}</option>`).join('');
+                 elements.breedSelect.innerHTML = ('beforeend', markupBreed);   
+      new SlimSelect({
+        select: elements.breedSelect
+      });
     })
     .catch(error => {
        console.log(error);
